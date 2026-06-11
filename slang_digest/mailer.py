@@ -1,25 +1,26 @@
+import re
 import smtplib
 from email.message import EmailMessage
 from typing import List
 
 from .config import EmailConfig
 
+bad_words: List[str] = []
 
 def build_email_body(slang_items: List[dict], quote: dict) -> str:
     lines = ["Here is today’s classic English quote:", ""]
-    lines.append(f"\"{quote['text']}\"")
-    lines.append(f"— {quote['author']}")
+    lines.append(f"\"{_sanitize(quote['text'])}\"")
+    lines.append(f"— {_sanitize(quote['author'])}")
     lines.append("")
     lines.append("Here are the latest young English slang terms for today:\n")
     for index, item in enumerate(slang_items, start=1):
-        lines.append(f"{index}. {item['word']}: {item['definition']}\n")
+        lines.append(f"{index}. {_sanitize(item['word'])}: {_sanitize(item['definition'])}\n")
     lines.append("Stay curious and enjoy learning new phrases!")
     return "\n".join(lines)
 
-
 def build_html_body(slang_items: List[dict], quote: dict) -> str:
     rows = "".join(
-        f"<li><strong>{item['word']}</strong>: {item['definition'].replace('\n', '<br>')}</li>"
+        f"<li><strong>{_sanitize(item['word'])}</strong>: {_sanitize(item['definition']).replace('\n', '<br>')}</li>"
         for item in slang_items
     )
     return f"""
@@ -38,6 +39,14 @@ def build_html_body(slang_items: List[dict], quote: dict) -> str:
 </html>
 """
 
+def _sanitize(text: str) -> str:
+    """Replace whole-word matches of any term in `bad_words` with asterisks.
+
+    The replacement preserves the length of the original word so layout
+    is not dramatically altered.
+    """
+    pattern = re.compile(r"\b({})\b".format('|'.join(map(re.escape, bad_words))), flags=re.IGNORECASE)
+    return pattern.sub(lambda m: '*' * len(m.group()), text)
 
 def send_email(config: EmailConfig, slang_items: List[dict], quote: dict) -> None:
     message = EmailMessage()
