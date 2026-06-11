@@ -6,6 +6,7 @@ import requests
 
 
 URBAN_DICTIONARY_RANDOM_URL = "https://api.urbandictionary.com/v0/random"
+QUOTABLE_RANDOM_URL = "https://api.quotable.io/random?tags=famous-quotes|inspirational|wisdom"
 FALLBACK_SLANG = [
     {
         "word": "glow-up",
@@ -87,3 +88,19 @@ def get_trending_slang(count: int = 5) -> List[Dict[str, str]]:
             slang_items.append(fallback.pop())
 
     return slang_items
+
+
+def get_daily_quote() -> Dict[str, str]:
+    try:
+        response = requests.get(QUOTABLE_RANDOM_URL, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "text": clean_text(data.get("content", "")),
+            "author": clean_text(data.get("author", "Unknown")),
+        }
+    except Exception:
+        return {
+            "text": "A true quote source could not be reached today.",
+            "author": "Quote service unavailable",
+        }

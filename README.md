@@ -48,9 +48,10 @@ If you want a different send time, re-run the script with `-Time "HH:mm"`.
 ## What it does
 
 - collects a short list of youth slang phrases
+- fetches a real classic English quote from an external quote service
 - formats a plain-text and HTML email
 - sends the email through SMTP
 
 ## Notes
 
-If Urban Dictionary is unavailable, the app falls back to a curated list of popular slang terms.
+If Urban Dictionary is unavailable, the app falls back to a curated list of popular slang terms. The quote is fetched from quotable.io; if that service is unavailable, the email still sends with a note explaining the quote source is temporarily unreachable.

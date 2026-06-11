@@ -2,7 +2,7 @@ import time
 
 import schedule
 
-from slang_digest.collector import get_trending_slang
+from slang_digest.collector import get_daily_quote, get_trending_slang
 from slang_digest.config import load_config
 from slang_digest.mailer import send_email
 
@@ -10,7 +10,8 @@ from slang_digest.mailer import send_email
 def send_daily_digest() -> None:
     config = load_config()
     slang_items = get_trending_slang(count=6)
-    send_email(config, slang_items)
+    quote = get_daily_quote()
+    send_email(config, slang_items, quote)
     print(f"Sent daily slang digest to {config.email_to}.")
 
 
