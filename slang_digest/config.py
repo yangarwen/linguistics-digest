@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
+from typing import List
 from dotenv import load_dotenv
 
 
@@ -12,6 +13,7 @@ class EmailConfig:
     email_from: str
     email_to: str
     email_subject: str = "Today's Young English Slang Digest"
+    bad_words: List[str] = field(default_factory=list)
 
 
 def load_config() -> EmailConfig:
@@ -24,6 +26,8 @@ def load_config() -> EmailConfig:
     email_from = os.getenv("EMAIL_FROM", "")
     email_to = os.getenv("EMAIL_TO", "")
     email_subject = os.getenv("EMAIL_SUBJECT", "Today's Young English Slang Digest")
+    raw_bad_words = os.getenv("BAD_WORDS", "")
+    bad_words = [w.strip() for w in raw_bad_words.split(",") if w.strip()]
 
     missing = [
         name for name, value in [
@@ -49,4 +53,5 @@ def load_config() -> EmailConfig:
         email_from=email_from,
         email_to=email_to,
         email_subject=email_subject,
+        bad_words=bad_words,
     )
